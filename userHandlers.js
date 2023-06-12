@@ -1,5 +1,14 @@
 const database = require("./database");
 
+
+const hidePasswords = (users) => {
+  return users.map((user) => {
+    const { hashedPassword, ...userWithoutPassword } = user;
+    console.log(userWithoutPassword)
+    return userWithoutPassword;
+  });
+};
+
 const getUsers = (req, res) => {
   const initialSql = "select * from users";
   const where = [];
@@ -29,7 +38,8 @@ const getUsers = (req, res) => {
       where.map(({ value }) => value)
     )
     .then(([users]) => {
-      res.json(users);
+      const usersWithoutPasswords = hidePasswords(users);
+      res.json(usersWithoutPasswords);
     })
     .catch((err) => {
       console.error(err);
@@ -44,7 +54,8 @@ const getUserById = (req, res) => {
     .query("select * from users where id = ?", [id])
     .then(([users]) => {
       if (users[0] != null) {
-        res.json(users[0]);
+        const usersWithoutPasswords = hidePasswords(users);
+        res.json(usersWithoutPasswords[0]);
       } else {
         res.status(404).send("Not Found");
       }
